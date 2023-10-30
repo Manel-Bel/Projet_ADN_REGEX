@@ -81,7 +81,6 @@ let rec cut_prefix (slice : 'a list) (list : 'a list) : 'a list option =
   | (l1::reste1, l2::reste2) -> 
     if not (l1 = l2) then None 
     else cut_prefix reste1 reste2;;
-  (* failwith "A faire" *)
 
 (*
   cut_prefix [1; 2; 3] [1; 2; 3; 4] = Some [4]
@@ -93,9 +92,18 @@ let rec cut_prefix (slice : 'a list) (list : 'a list) : 'a list option =
 (* return the prefix and the suffix of the first occurrence of a slice,
    or None if this occurrence does not exist.
 *)
-let first_occ (slice : 'a list) (list : 'a list)
-    : ('a list * 'a list) option =
-  failwith "À compléter"
+   let first_occ (slice : 'a list) (list : 'a list)
+   : ('a list * 'a list) option =
+   let rec aux pattern before list =
+     match (list , pattern) with
+     | ([], _) -> None 
+     | (x::rest, _) -> 
+         match cut_prefix pattern list with
+         | None -> aux pattern (x::before) rest
+         | Some suffixe -> Some (List.rev before, suffixe)
+   in aux slice [] list
+
+
 (*
   first_occ [1; 2] [1; 1; 1; 2; 3; 4; 1; 2] = Some ([1; 1], [3; 4; 1; 2])
   first_occ [1; 1] [1; 1; 1; 2; 3; 4; 1; 2] = Some ([], [1; 2; 3; 4; 1; 2])
