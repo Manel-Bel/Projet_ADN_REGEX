@@ -20,7 +20,14 @@ let string_of_base (b : base) : string =
 
 (* explode a string into a char list *)
 let explode (str : string) : char list =
-  failwith "À compléter"
+  let rec aux chaine index acc =
+    if index < 0 then
+      acc 
+    else aux chaine (index - 1) (chaine.[index] :: acc) 
+  (* failwith "À compléter" *)
+  in
+  aux str ((String.length str) -1) []
+;;
 
 
 (* conversions *)
@@ -119,3 +126,4 @@ let consensus_sequence (ll : 'a list list) : 'a consensus list =
 
  consensus_sequence [[]; []; []] = []
  *)
+
