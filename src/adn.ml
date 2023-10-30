@@ -39,14 +39,29 @@ let base_of_char (c : char) : base =
   | 'T' -> T
   | _ -> WC
 ;; 
+
 let dna_of_string (s : string) : base list =
   List.map base_of_char (explode s);;
-  (* failwith "À compléter" *)
+
 
 
 let string_of_dna (seq : dna) : string =
-  failwith "À compléter"
+  let char_of_base (b : base) : char =
+    match b with 
+    | A -> 'A' 
+    | C -> 'C'
+    | G -> 'G'
+    | T -> 'T'
+    | WC -> '.'
+  in 
+  let rec aux liste =
+    match liste with 
+    | [] -> ""
+    | x::rest -> (Char.escaped x)^(aux rest) 
+  in 
+  aux (List.map char_of_base seq)
 
+ 
 
 
 (*---------------------------------------------------------------------------*)
