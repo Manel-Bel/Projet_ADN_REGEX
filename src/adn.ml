@@ -75,7 +75,7 @@ let string_of_dna (seq : dna) : string =
 
 (* if list = pre@suf, return Some suf. otherwise, return None *)
 let rec cut_prefix (slice : 'a list) (list : 'a list) : 'a list option =
-  match (slice,liste) with 
+  match (slice,list) with 
   | ([], l ) -> Some l
   | (_ , []) -> None
   | (l1::reste1, l2::reste2) -> 
@@ -103,69 +103,32 @@ let rec cut_prefix (slice : 'a list) (list : 'a list) : 'a list option =
          | Some suffixe -> Some (List.rev before, suffixe)
    in aux slice [] list
 
-
 (*
   first_occ [1; 2] [1; 1; 1; 2; 3; 4; 1; 2] = Some ([1; 1], [3; 4; 1; 2])
   first_occ [1; 1] [1; 1; 1; 2; 3; 4; 1; 2] = Some ([], [1; 2; 3; 4; 1; 2])
   first_occ [1; 3] [1; 1; 1; 2; 3; 4; 1; 2] = None
  *)
 
- slices_between [A] [G] [A; C; T; G; G; A; C; T; A; T; G; A; G]
- = 
- 
- [[C; T]; [C; T; A; T]; []]
-
- let (before, suffix) = first_occ [A] list in d
- before_start = []
- suffix_start = [ C; T; G; G; A; C; T; A; T; G; A; G]
-
- let (before, suffix) = first_occ stop [ C; T; G; G; A; C; T; A; T; G; A; G] in 
- before_stop = [C; T]
- suffix_stop = [ G; A; C; T; A; T; G; A; G]
-
- let (before, suffix) = first_occ start [ G; A; C; T; A; T; G; A; G] in 
- before_start = [G]
- suffix_start = [ C; T; A; T; G; A; G]
-
- let (before, suffix) = first_occ stop [ C; T; A; T; G; A; G] in 
- before_stop = [C; T; A; T;]
- suffix_stop = [ A; G]
-
- let (before, suffix) = first_occ start [ A; G] in 
- before_start = []
- suffix_start = [ G]
-
- let (before, suffix) = first_occ stop [ G] in 
- before_stop = []
- suffix_stop = [ ]
-
-
 let rec slices_between
-          (start : 'a list) (stop : 'a list) (list : 'a list) : 'a list list =
-          match list with
-          | [] -> []
-          | _ -> 
-            match first_occ start list with 
-            | None -> []
-            | Some (before_start, suffix_start) -> 
-              match (first_occ stop suffix_start) with 
-              | None -> []
-              | Some (before_stop, suffix_stop) -> before_stop :: (slices_between start stop suffix_stop)
-
-            (* let (before_start, suffix_start) = first_occ start list in 
-            let (before_stop, suffix_stop) = first_occ stop suffix_start in 
-            before_stop :: (slices_between start stop suffix_stop) *)
-            (* List.concat [slices_between start stop before_start; [before_start @ start :: after_start]] *)
-
-          ;;
-  (* failwith "A faire" *)
+  (start : 'a list) (stop : 'a list) (list : 'a list) : 'a list list =
+  match list with
+  | [] -> []
+  | _ -> 
+    match first_occ start list with 
+    | None -> []
+    | Some (before_start, suffix_start) -> 
+      match (first_occ stop suffix_start) with 
+      | None -> []
+      | Some (before_stop, suffix_stop) -> before_stop :: (slices_between start stop suffix_stop)
+  ;;
 
 (*
   slices_between [1; 1] [1; 2] [1; 1; 1; 1; 2; 1; 3; 1; 2] = [[1]; []; [2; 1; 3]]
  *)
 
-let cut_genes (dna : dna) : (dna list) =
-  failwith "A faire"
+let cut_genes (dna : dna) : (dna list) = 
+  slices_between [A; T; G] [T; A; A] dna;;
+;;
 
 (*---------------------------------------------------------------------------*)
 (*                          CONSENSUS SEQUENCES                              *)
