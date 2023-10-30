@@ -141,8 +141,39 @@ type 'a consensus = Full of 'a | Partial of 'a * int | No_consensus
    (Partial (a, n)) if a is the only element of the list with the
    greatest number of occurrences and this number is equal to n,
    No_consensus otherwise. *)
+
+type dict_alpha = {A_: int; C_: int; T_: int; G_: int; WC_: int};;
+
 let consensus (list : 'a list) : 'a consensus =
-  failwith "À compléter"
+  let d = {A =  0; C =  0; T =  0; G =  0; WC =  0} in 
+  let rec fun_occ list dict_al = 
+    match list with
+    | [] -> dict_al
+    | e::rest-> 
+      match e with 
+      | A ->  let dict_al = {dict_al with A_ = A_ + 1} 
+      | C ->  let dict_al = {dict_al with C_ = C_ + 1} 
+      | G ->  let dict_al = {dict_al with G_ = G_ + 1} 
+      | T ->  let dict_al = {dict_al with G_ = G_ + 1}
+      | WC -> let dict_al = {dict_al with WC_ = WC_ + 1}
+    in fun_occ rest dict_al 
+  in 
+  let nv_d = fun_occ list d in 
+  let couple_max = [(A, nv_d.A_); (None , 0)] in 
+
+  if nv_d.C_ > snd (List.hd couple_max) then 
+    begin 
+      let couple_max = [(C, nv_d.C_); (None , 0)] in 
+    end 
+    
+
+    [(A =  0;) (C =  0); (T =  0); G =  0; WC =  0]
+  
+List.filter (fun (b, occ) -> if occ > (snd (List.hd couple_max)) then couple_max = [ (b, occ); (None , 0)]
+else  if occ > (snd (List.hd couple_max))
+  )
+  (* failwith "À compléter" *)
+
 
 (*
    consensus [1; 1; 1; 1] = Full 1
