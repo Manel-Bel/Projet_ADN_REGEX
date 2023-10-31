@@ -135,46 +135,85 @@ let cut_genes (dna : dna) : (dna list) =
 (*---------------------------------------------------------------------------*)
 
 
-type 'a consensus = Full of 'a | Partial of 'a * int | No_consensus
+type 'a consensus = Full of 'a | Partial of 'a * int | No_consensus;;
 
 (* return (Full a) if all elements of the list are equal to a,
    (Partial (a, n)) if a is the only element of the list with the
    greatest number of occurrences and this number is equal to n,
    No_consensus otherwise. *)
+let occurrence list = 
+  let tab = Array.make 5 0 in 
+  let rec aux = function 
+  | [] -> ()
+  | e::rest ->
+    match e with 
+    | A -> tab.(0) <- tab.(0) + 1
+    | C -> tab.(1) <- tab.(1) + 1
+    | G -> tab.(2) <- tab.(2) + 1
+    | T -> tab.(3) <- tab.(3) + 1
+    | WC -> tab.(4) <- tab.(4) + 1
+    aux rest
+  in 
+  aux list;
+  tab
+;;
 
-type dict_alpha = {A_: int; C_: int; T_: int; G_: int; WC_: int};;
+let max1_max2 tab =
+  Array.sorted (fun x y -> compare y x) tab;
+  (tab.(0), tab.(1))
+;;
+
+let get_elem tab occ = 
+  match occ with 
+  | tab.(0) -> A
+  | tab.(1) -> C
+  | tab.(2) -> G
+  | tab.(3) -> T
+  | _ -> WC
+;;
+
 
 let consensus (list : 'a list) : 'a consensus =
-  let d = {A =  0; C =  0; T =  0; G =  0; WC =  0} in 
-  let rec fun_occ list dict_al = 
-    match list with
-    | [] -> dict_al
-    | e::rest-> 
-      match e with 
-      | A ->  let dict_al = {dict_al with A_ = A_ + 1} 
-      | C ->  let dict_al = {dict_al with C_ = C_ + 1} 
-      | G ->  let dict_al = {dict_al with G_ = G_ + 1} 
-      | T ->  let dict_al = {dict_al with G_ = G_ + 1}
-      | WC -> let dict_al = {dict_al with WC_ = WC_ + 1}
-    in fun_occ rest dict_al 
-  in 
-  let nv_d = fun_occ list d in 
-  let couple_max = [(A, nv_d.A_); (None , 0)] in 
+  match list with
+  | [] -> No_consensus
+  | _ -> 
+    let tab1 = occurrence list in 
+    let (max1, max2) = max1_max2 tab in 
+    if max1 = max2 then No_consensus
+    else 
+      let e1 =  match max1 with 
+      | tab.(0) -> A
+      | tab.(1) -> C
+      | tab.(2) -> G
+      | tab.(3) -> T
+      | _ -> WC
+    in 
+      if max2 = 0 then Full e1
+      else 
+        Partial(e1, max1)
+      ;;
 
-  if nv_d.C_ > snd (List.hd couple_max) then 
-    begin 
-      let couple_max = [(C, nv_d.C_); (None , 0)] in 
-    end 
-    
+      (* let consensus (list : 'a list) : 'a consensus =
+      match list with
+      | [] -> No_consensus
+      | _ -> 
+          let tab = occurrence list in 
+          let (max1, max2) = max1_max2 tab in 
+          if max1 = max2 then No_consensus
+          else 
+            let e1 =  match max1 with 
+              | tab.(0) -> A
+              | tab.(1) -> C
+              | tab.(2) -> G
+              | tab.(3) -> T
+              | _ -> WC
+            in 
+            if max2 = 0 then Full e1
+            else 
+              Partial(e1, max1)
+    ;; *)
 
-    [(A =  0;) (C =  0); (T =  0); G =  0; WC =  0]
-  
-List.filter (fun (b, occ) -> if occ > (snd (List.hd couple_max)) then couple_max = [ (b, occ); (None , 0)]
-else  if occ > (snd (List.hd couple_max))
-  )
   (* failwith "À compléter" *)
-
-
 (*
    consensus [1; 1; 1; 1] = Full 1
    consensus [1; 1; 1; 2] = Partial (1, 3)
