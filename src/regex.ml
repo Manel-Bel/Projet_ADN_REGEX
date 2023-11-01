@@ -52,8 +52,12 @@ let rec is_finite e =
     if (is_empty a) then true else false 
 ;;
 
-let product l1 l2 =
-  failwith "À compléter"
+let rec product l1 l2 =
+  match l1 with
+  | [] -> []
+  | a::rest -> (List.map (fun souslist -> a@souslist) l2)@(product rest l2)
+;;
+
 
 let enumerate alphabet e =
   failwith "À compléter"
