@@ -21,9 +21,17 @@ let expr_repeat n e =
     let rec aux n e = 
       if (n = 1) then e;
       else Concat(e, aux (n-1) e)
+;;
 
 let rec is_empty e =
-  failwith "À compléter"
+  match e with 
+  | Eps  -> true 
+  | Base a -> false 
+  | Concat (a , b) -> (is_empty a ) && (is_empty b)
+  | Alt (a,b) -> (is_empty a ) || (is_empty b)
+  | Star a -> is_empty a
+  | _ -> false
+;;
 
 let rec null e =
   failwith "À compléter"
