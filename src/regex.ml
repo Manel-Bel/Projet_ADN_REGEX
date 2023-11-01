@@ -3,17 +3,24 @@ open Regex_base
 let repeat n l =
   let rec aux n l acc =
     if n = 0 then []
-    else repeat (n-1) l@acc
+    else aux (n-1) l@acc
   in
   aux n l l
 ;;
+
 (* non terminal *)
 let rec repeat_not_ter n l = 
   if n = 0 then []
   else l@ (repeat_not_ter (n-1) l) 
 ;;
-let rec expr_repeat n e =
-  failwith "À compléter"
+
+(* à revoir *)
+let expr_repeat n e = 
+  if (n < 1) then Esp
+  else
+    let rec aux n e = 
+      if (n = 1) then e;
+      else Concat(e, aux (n-1) e)
 
 let rec is_empty e =
   failwith "À compléter"
