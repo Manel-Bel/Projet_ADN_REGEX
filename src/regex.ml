@@ -1,8 +1,17 @@
 open Regex_base
 
-let rec repeat n l =
-  failwith "À compléter"
-
+let repeat n l =
+  let rec aux n l acc =
+    if n = 0 then []
+    else repeat (n-1) l@acc
+  in
+  aux n l l
+;;
+(* non terminal *)
+let rec repeat_not_ter n l = 
+  if n = 0 then []
+  else l@ (repeat_not_ter (n-1) l) 
+;;
 let rec expr_repeat n e =
   failwith "À compléter"
 
