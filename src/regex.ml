@@ -41,10 +41,14 @@ let rec null e =
   | Alt (a, b) -> (null a) || (null b)
   | Star a -> null a                        
   | _ -> false
-
+;;
 
 let rec is_finite e =
-  failwith "À compléter"
+  match e with 
+  | Eps | Base _ | Star Eps -> true
+  | Concat (a, b) | Alt (a, b) -> ((is_finite a) && (is_finite b))
+  | Start _ -> false 
+;;
 
 let product l1 l2 =
   failwith "À compléter"
