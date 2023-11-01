@@ -22,6 +22,7 @@ let expr_repeat n e =
       if (n = 1) then e;
       else Concat(e, aux (n-1) e)
 ;;
+(* telle que is_empty e renvoie true si et seulement si le langage reconnu par e ne *)
 
 let rec is_empty e =
   match e with 
@@ -45,9 +46,10 @@ let rec null e =
 
 let rec is_finite e =
   match e with 
-  | Eps | Base _ | Star Eps -> true
+  | Eps | Base _ | Joker  -> true
   | Concat (a, b) | Alt (a, b) -> ((is_finite a) && (is_finite b))
-  | Start _ -> false 
+  | Star a -> 
+    if (is_empty a) then true else false 
 ;;
 
 let product l1 l2 =
