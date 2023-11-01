@@ -34,7 +34,14 @@ let rec is_empty e =
 ;;
 
 let rec null e =
-  failwith "À compléter"
+  match e with
+  | Eps | Star Eps -> true
+  | Base a -> false
+  | Concat (a, b) -> (null a) && (null b)
+  | Alt (a, b) -> (null a) || (null b)
+  | Star a -> null a                        
+  | _ -> false
+
 
 let rec is_finite e =
   failwith "À compléter"
