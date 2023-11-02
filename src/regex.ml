@@ -52,6 +52,8 @@ let rec is_finite e =
     if (is_empty a) then true else false 
 ;;
 
+(* product l1 l2 renvoie l’ensemble des mots formés de la concaténation
+d’un mot de l1 et d’un mot de l2 *)
 let rec product l1 l2 =
   match l1 with
   | [] -> []
@@ -59,14 +61,66 @@ let rec product l1 l2 =
 ;;
 
 
-let enumerate alphabet e =
-  failwith "À compléter"
+(* si e est une expression sur l’ensemble fini de lettres alphabet, alors
+enumerate alphabet e renvoie : Some l où l est le langage reconnu par e si ce
+langage est fini ; None si ce langage est infini. *)
+let rec enumerate alphabet e =
+  if not (is_finite e) then None
+  else 
+    match e with 
+    | Eps -> Some [[]]
+    | Base a -> if List.mem a alphabet then Some [[a]] else Some [[]]
+    | Joker -> Some (List.map (fun x -> [x]) alphabet)
+    | Concat (a,b) -> 
+        (match (enumerate alphabet a) with
+         | None -> None
+         | Some alpha1 ->
+             (match (enumerate alphabet b) with 
+              | None -> None
+              | Some alpha2 -> Some (product alpha1 alpha2)
+             )
+        )
+    | Alt (a,b) -> 
+        (match (enumerate alphabet a) with
+         | None -> None
+         | Some alpha1 ->
+             (match (enumerate alphabet b) with 
+              | None -> None
+              | Some alpha2 -> Some (alpha1@alpha2)
+             )
+        )
+    | Star a -> None
+;;
 
+(* alphabet_expr e renvoie l’ensemble (la liste triée sans duplicata) des
+lettres apparaissant dans e *)
 let rec alphabet_expr e =
+  (* match e with 
+  | Eps ->  []
+  | Base a -> [a]
+  | Joker -> []
+  | Concat (a,b) ->  union_sorted (alphabet_expr a) (alphabet_expr b)
+  | Alt (a,b) ->   union_sorted (alphabet_expr a)  (alphabet_expr b)
+  | Star a -> (alphabet_expr a) *)
   failwith "À compléter"
+;;
 
 type answer =
   Infinite | Accept | Reject
 
-let accept_partial e w =
-  failwith "À compléter"
+let rec accept_partial e w =
+  (* if not (is_finite e) then Infinite
+  else 
+    let alpha = union_sorted (alphabet_expr e) w in
+    let rec contient e w =
+      match e with
+      | Eps -> if (w = []) then true else false 
+      | Base a -> if (List.mem a w )then true else false
+      | Concat (a, b) -> (contient a w) && (contient b w)
+      | Alt (a, b) -> (contient a w) || (contient b w)
+      | Star a -> contient a w                     
+      | _ -> false
+    in 
+    if contient e alpha then Accept else Reject  *)
+    failwith "À compléter"
+;;
