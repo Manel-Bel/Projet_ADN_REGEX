@@ -3,46 +3,67 @@ open Regex_base
 let repeat n l =
   let rec aux n l acc =
     if n = 0 then []
-    else aux (n-1) l@acc
+    else aux (n-1) l l@acc
   in
   aux n l l
 ;;
 
 (* non terminal *)
-let rec repeat_not_ter n l = 
+(* let rec repeat_not_ter n l = 
   if n = 0 then []
   else l@ (repeat_not_ter (n-1) l) 
-;;
+;; *)
 
 (* à revoir *)
+
+(* expr_repeat n e renvoie une expression régulière qui reconnaît les mots
+formés de la concaténation de n mots reconnus par e. *)
 let expr_repeat n e = 
-  if (n < 1) then Esp
+  if (n < 1) then Eps
   else
     let rec aux n e = 
-      if (n = 1) then e;
-      else Concat(e, aux (n-1) e)
+      if (n = 1) then e
+      else Concat (e, aux (n-1) e)
+    in 
+    aux n e 
 ;;
-(* telle que is_empty e renvoie true si et seulement si le langage reconnu par e ne *)
 
+(* is_empty e renvoie true ssi le langage reconnu par e ne contient que le mot vide.
+   À noter que e n’est pas nécessairement Eps.*)
 let rec is_empty e =
   match e with 
   | Eps  -> true 
   | Base a -> false 
+  | Joker -> false 
   | Concat (a , b) -> (is_empty a ) && (is_empty b)
   | Alt (a,b) -> (is_empty a ) || (is_empty b)
   | Star a -> is_empty a
-  | _ -> false
+  (* | _ -> false this match case is unused. *)
 ;;
 
+
+(* null e renvoie true si et seulement si le mot vide est reconnu par e. *)
 let rec null e =
   match e with
   | Eps | Star Eps -> true
   | Base a -> false
+  | Joker -> false 
   | Concat (a, b) -> (null a) && (null b)
   | Alt (a, b) -> (null a) || (null b)
   | Star a -> null a                        
-  | _ -> false
+  (* | _ -> false this match case is unused. *)
 ;;
+
+(* -------------------------------------------------------------
+4.3 Reconnaissance de langages finis
+------------------------------------------------------------- *)
+
+
+(* . Vous pouvez utiliser la fonction union_sorted
+: 'a list -> 'a list -> 'a list vue en TD, qui fait l’«union» de deux
+ensembles représentés par des listes triées. Vous pouvez aussi utiliser la fonction sort_uniq : 'a list -> 'a list qui renvoie son argument trié et sans
+duplicata. Vu le coût de cette fonction, attention à ne pas l’utiliser trop souvent. *)
+
 
 let rec is_finite e =
   match e with 

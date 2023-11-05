@@ -141,7 +141,7 @@ type 'a consensus = Full of 'a | Partial of 'a * int | No_consensus;;
    (Partial (a, n)) if a is the only element of the list with the
    greatest number of occurrences and this number is equal to n,
    No_consensus otherwise. *)
-let occurrence list = 
+(* let occurrence list = 
   let tab = Array.make 5 0 in 
   let rec aux = function 
   | [] -> ()
@@ -156,9 +156,9 @@ let occurrence list =
   in 
   aux list;
   tab
-;;
+;; *)
 
-let max1_max2 tab =
+(* let max1_max2 tab =
   Array.sorted (fun x y -> compare y x) tab;
   (tab.(0), tab.(1))
 ;;
@@ -170,11 +170,12 @@ let get_elem tab occ =
   | tab.(2) -> G
   | tab.(3) -> T
   | _ -> WC
-;;
+;; *)
 
 
 let consensus (list : 'a list) : 'a consensus =
-  match list with
+   failwith "À compléter"
+  (* match list with
   | [] -> No_consensus
   | _ -> 
     let tab1 = occurrence list in 
@@ -190,7 +191,7 @@ let consensus (list : 'a list) : 'a consensus =
     in 
       if max2 = 0 then Full e1
       else 
-        Partial(e1, max1)
+        Partial(e1, max1) *)
       ;;
 
       (* let consensus (list : 'a list) : 'a consensus =
