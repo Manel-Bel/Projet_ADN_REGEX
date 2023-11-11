@@ -96,7 +96,8 @@ let rec cut_prefix (slice : 'a list) (list : 'a list) : 'a list option =
    : ('a list * 'a list) option =
    let rec aux pattern before list =
      match (list , pattern) with
-     | ([], _) -> None 
+     | ([], []) -> Some ([],[])
+     | ([], _) -> None
      | (x::rest, _) -> 
          match cut_prefix pattern list with
          | None -> aux pattern (x::before) rest
