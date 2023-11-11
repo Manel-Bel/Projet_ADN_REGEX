@@ -137,18 +137,39 @@ let cut_genes (dna : dna) : (dna list) =
 
 type 'a consensus = Full of 'a | Partial of 'a * int | No_consensus;;
 
-
-let max1_max2 (list : int list) =
-  let rec aux m1 m2 list =
-    match list with 
-    | [] -> (!m1, !m2)
-    | freq1::rest -> 
-        if (freq1 > !m2) then 
-          m2 := freq1;
-        if (freq1 > !m1) then (m1 := freq1);
-        aux m1 m2 rest
+let remove_duplicates (liste : 'a list) : 'a list =
+  let rec aux liste1 acc = 
+    match liste1 with
+    | [] -> acc (*acc contient la nouvelle liste sans doublons*)
+    | e::restes -> 
+      if (List.mem e acc) then (aux restes acc) (*si on a deja prit e alors on change pas acc*)
+      else aux restes (e::acc)
   in 
-  aux (ref 0) (ref 0) list
+  aux liste []
+;;
+
+let max1_max2 (list_f : int list) (list_e : 'a list) =
+  let rec aux e1 m1 e2 m2 l_f l_e=
+    match (l_f,l_e) with 
+    | ([],[]) -> ((!e1,!m1), (!e2,!m2))
+    | (freq::rest_f,e::rest_e) -> 
+        if (freq >= !m1) then
+          begin 
+            m2 := !m1;
+            e2 := !e1;
+            m1 := freq;
+            e1 := Some e;
+          end
+        else 
+        if freq > !m2 then 
+          begin 
+            e2 := Some e;
+            m2 := freq;
+          end;
+        aux e1 m1 e2 m2 rest_f rest_e
+    | (_,_) -> ((None,0),(None,0))
+  in 
+  aux (ref None) (ref 0) (ref None) (ref 0 ) list_f list_e
           
 ;;
 
@@ -161,14 +182,6 @@ let freq list list_doublon =
   List.map (fun e -> (aux e list_doublon 0)) list
 ;;
 
-let get_indice_elm l1 l2 elm =
-  let rec aux l1 l2 i =
-    match (l1, l2) with
-    | (e1::rest1,e2::rest2) -> if (i == e2) then Some e1 else aux rest1 rest2 i
-    | (_,_) -> None 
-  in 
-  aux l1 l2 elm
-;;
 
 (* liste l, calcule le consensus de ses valeurs, défini comme :
 – Full b si tous les éléments de l sont égaux à b,
@@ -178,9 +191,15 @@ let consensus (list : 'a list) : 'a consensus =
   match list with 
   | [] -> No_consensus
   | e::reste -> 
-    let set_list = union_sorted list [] in 
+    let set_list = remove_duplicates list in 
     let freq_list = freq set_list list in 
-    let (m1,m2) = max1_max2 freq_list in 
+    let ((e1, m1),(e2,m2)) = max1_max2 freq_list set_list in 
+    match (e1,e2) with 
+    | (Some e , None) -> Full e (*e1 seul dans set_list*)
+    | (Some x, Some y) -> if (m1 = m2) then No_consensus else Partial (x,m1)
+    | _ -> No_consensus
+;;
+
 
 
 ;;
