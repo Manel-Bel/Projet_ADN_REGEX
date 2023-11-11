@@ -87,7 +87,7 @@ let rec product l1 l2 =
 enumerate alphabet e renvoie : Some l où l est le langage reconnu par e si ce
 langage est fini ; None si ce langage est infini. *)
 let rec enumerate alphabet e =
-  if not (is_finite e) then None
+  if not (is_finite e) then None (*Vérif terminaison de l'expr.*)
   else 
     match e with 
     | Eps -> Some [[]]
@@ -130,7 +130,7 @@ let union_sorted l1 l2 =
   
 (* alphabet_expr e renvoie l’ensemble (la liste triée sans duplicata) des
 lettres apparaissant dans e *)
-let rec alphabet_expr e =
+let rec alphabet_expr e = 
   match e with 
   | Eps ->  []
   | Base a -> [a]
@@ -142,19 +142,19 @@ let rec alphabet_expr e =
 type answer =
   Infinite | Accept | Reject
 
-let rec accept_partial e w =
-  (* if not (is_finite e) then Infinite
+(* expressions e et tout mot w, accept_partial e w renvoie
+– Infinite si le langage reconnu par e est infini,
+– Accept si le langage reconnu par e est fini et contient le mot w,
+– Reject si le langage reconnu par e est fini et ne contient pas w.
+l'alphabet de e sera l’union des ensembles des lettres apparaissant 
+dans e et w. *)
+let rec accept_partial e w = 
+  if not (is_finite e) then Infinite
   else 
-    let alpha = union_sorted (alphabet_expr e) w in
-    let rec contient e w =
-      match e with
-      | Eps -> if (w = []) then true else false 
-      | Base a -> if (List.mem a w )then true else false
-      | Concat (a, b) -> (contient a w) && (contient b w)
-      | Alt (a, b) -> (contient a w) || (contient b w)
-      | Star a -> contient a w                     
-      | _ -> false
-    in 
-    if contient e alpha then Accept else Reject  *)
-    failwith "À compléter"
+    let alphabet = union_sorted (alphabet_expr e) w in
+    match enumerate alphabet e with
+    | None -> Reject
+    | Some l -> if List.mem w l then Accept else Reject
 ;;
+
+
