@@ -114,17 +114,29 @@ let rec enumerate alphabet e =
     | Star a -> None
 ;;
 
+(* union_sorted renvoie la liste triée sans duplicata *)
+let union_sorted l1 l2 =
+  let rec aux l1 l2 acc =
+    match l1,l2 with 
+    | [], [] -> List.rev acc
+    | [], _ -> List.rev_append acc l2
+    | _, [] -> List.rev_append acc l1
+    | x::l1', y::l2' -> 
+        if (x = y) then aux l1' l2' (x::acc)
+        else if (x < y) then aux l1' l2 (x::acc)
+        else aux l1 l2' (y::acc) 
+  in aux l1 l2 []
+;; 
+  
 (* alphabet_expr e renvoie l’ensemble (la liste triée sans duplicata) des
 lettres apparaissant dans e *)
 let rec alphabet_expr e =
-  (* match e with 
+  match e with 
   | Eps ->  []
   | Base a -> [a]
   | Joker -> []
-  | Concat (a,b) ->  union_sorted (alphabet_expr a) (alphabet_expr b)
-  | Alt (a,b) ->   union_sorted (alphabet_expr a)  (alphabet_expr b)
-  | Star a -> (alphabet_expr a) *)
-  failwith "À compléter"
+  | Concat (a,b) | Alt (a,b) ->  union_sorted (alphabet_expr a) (alphabet_expr b)
+  | Star a -> (alphabet_expr a)
 ;;
 
 type answer =
