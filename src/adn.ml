@@ -137,84 +137,54 @@ let cut_genes (dna : dna) : (dna list) =
 
 type 'a consensus = Full of 'a | Partial of 'a * int | No_consensus;;
 
-(* return (Full a) if all elements of the list are equal to a,
-   (Partial (a, n)) if a is the only element of the list with the
-   greatest number of occurrences and this number is equal to n,
-   No_consensus otherwise. *)
-(* let occurrence list = 
-  let tab = Array.make 5 0 in 
-  let rec aux = function 
-  | [] -> ()
-  | e::rest ->
-    match e with 
-    | A -> tab.(0) <- tab.(0) + 1
-    | C -> tab.(1) <- tab.(1) + 1
-    | G -> tab.(2) <- tab.(2) + 1
-    | T -> tab.(3) <- tab.(3) + 1
-    | WC -> tab.(4) <- tab.(4) + 1
-    aux rest
-  in 
-  aux list;
-  tab
-;; *)
 
-(* let max1_max2 tab =
-  Array.sorted (fun x y -> compare y x) tab;
-  (tab.(0), tab.(1))
+let max1_max2 (list : int list) =
+  let rec aux m1 m2 list =
+    match list with 
+    | [] -> (!m1, !m2)
+    | freq1::rest -> 
+        if (freq1 > !m2) then 
+          m2 := freq1;
+        if (freq1 > !m1) then (m1 := freq1);
+        aux m1 m2 rest
+  in 
+  aux (ref 0) (ref 0) list
+          
 ;;
 
-let get_elem tab occ = 
-  match occ with 
-  | tab.(0) -> A
-  | tab.(1) -> C
-  | tab.(2) -> G
-  | tab.(3) -> T
-  | _ -> WC
-;; *)
+let freq list list_doublon = 
+  let rec aux elm l acc =
+    match l with
+    | [] -> acc
+    | e::rest -> if(e = elm) then (aux elm rest (1+acc)) else (aux elm rest acc)
+  in 
+  List.map (fun e -> (aux e list_doublon 0)) list
+;;
 
+let get_indice_elm l1 l2 elm =
+  let rec aux l1 l2 i =
+    match (l1, l2) with
+    | (e1::rest1,e2::rest2) -> if (i == e2) then Some e1 else aux rest1 rest2 i
+    | (_,_) -> None 
+  in 
+  aux l1 l2 elm
+;;
 
+(* liste l, calcule le consensus de ses valeurs, défini comme :
+– Full b si tous les éléments de l sont égaux à b,
+– Partial (b, n) si b est l’unique valeur apparaissant le plus grand nombre de fois dans l 
+– No_consensus :: autres cas. *)
 let consensus (list : 'a list) : 'a consensus =
-   failwith "À compléter"
-  (* match list with
+  match list with 
   | [] -> No_consensus
-  | _ -> 
-    let tab1 = occurrence list in 
-    let (max1, max2) = max1_max2 tab in 
-    if max1 = max2 then No_consensus
-    else 
-      let e1 =  match max1 with 
-      | tab.(0) -> A
-      | tab.(1) -> C
-      | tab.(2) -> G
-      | tab.(3) -> T
-      | _ -> WC
-    in 
-      if max2 = 0 then Full e1
-      else 
-        Partial(e1, max1) *)
-      ;;
+  | e::reste -> 
+    let set_list = union_sorted list [] in 
+    let freq_list = freq set_list list in 
+    let (m1,m2) = max1_max2 freq_list in 
 
-      (* let consensus (list : 'a list) : 'a consensus =
-      match list with
-      | [] -> No_consensus
-      | _ -> 
-          let tab = occurrence list in 
-          let (max1, max2) = max1_max2 tab in 
-          if max1 = max2 then No_consensus
-          else 
-            let e1 =  match max1 with 
-              | tab.(0) -> A
-              | tab.(1) -> C
-              | tab.(2) -> G
-              | tab.(3) -> T
-              | _ -> WC
-            in 
-            if max2 = 0 then Full e1
-            else 
-              Partial(e1, max1)
-    ;; *)
 
-  (* failwith "À compléter" *)
+;;
+ 
 (*
    consensus [1; 1; 1; 1] = Full 1
    consensus [1; 1; 1; 2] = Partial (1, 3)
@@ -228,7 +198,7 @@ let consensus (list : 'a list) : 'a consensus =
  *)
 
 let consensus_sequence (ll : 'a list list) : 'a consensus list =
-  failwith "À compléter"
+  failwith "À compléter";;
 
 (*
  consensus_sequence [[1; 1; 1; 1];
