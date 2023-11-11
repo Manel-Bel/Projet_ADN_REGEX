@@ -36,7 +36,7 @@ let rec is_empty e =
   | Base a -> false 
   | Joker -> false 
   | Concat (a , b) -> (is_empty a ) && (is_empty b)
-  | Alt (a,b) -> (is_empty a ) || (is_empty b)
+  | Alt (a,b) -> (is_empty a ) && (is_empty b)
   | Star a -> is_empty a
   (* | _ -> false this match case is unused. *)
 ;;
