@@ -45,12 +45,13 @@ let rec is_empty e =
 (* null e renvoie true si et seulement si le mot vide est reconnu par e. *)
 let rec null e =
   match e with
-  | Eps | Star Eps -> true
+  | Eps -> true
   | Base a -> false
   | Joker -> false 
   | Concat (a, b) -> (null a) && (null b)
   | Alt (a, b) -> (null a) || (null b)
-  | Star a -> null a                        
+  | Star a -> true
+                        
   (* | _ -> false this match case is unused. *)
 ;;
 
