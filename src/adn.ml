@@ -60,9 +60,8 @@ let string_of_dna (seq : dna) : string =
     | x::rest -> (aux rest (acc^(Char.escaped x))) (*Char.escaped = convertit un char en String*)
   in 
   aux (List.map char_of_base seq) ""
-
+;;
  
-
 
 (*---------------------------------------------------------------------------*)
 (*                                   SLICES                                  *)
@@ -73,14 +72,16 @@ let string_of_dna (seq : dna) : string =
  *)
 
 
-(* if list = pre@suf, return Some suf. otherwise, return None *)
+(* prend en entrée une liste pre et une liste l, et renvoie :
+  – None, si la liste pre n’est pas un préfixe de l.
+  – Some(suf), si l = pre @ suf.*)
 let rec cut_prefix (slice : 'a list) (list : 'a list) : 'a list option =
   match (slice,list) with 
-  | ([], l ) -> Some l
-  | (_ , []) -> None
+  | ([], l ) -> Some l (*si pre vide -> la list*)
+  | (_, []) -> None (*si la liste est vide --> None*)
   | (l1::reste1, l2::reste2) -> 
-    if not (l1 = l2) then None 
-    else cut_prefix reste1 reste2;;
+    if not (l1 = l2) then None (*si le 1er elm de slice <> du 1er elm de List --> slice n'est pas prefix*)
+    else cut_prefix reste1 reste2;; (*sinon on verif pour le reste *)
 
 (*
   cut_prefix [1; 2; 3] [1; 2; 3; 4] = Some [4]
@@ -89,20 +90,20 @@ let rec cut_prefix (slice : 'a list) (list : 'a list) : 'a list option =
  *)
 
 
-(* return the prefix and the suffix of the first occurrence of a slice,
-   or None if this occurrence does not exist.
+(* retouner le  prefix et suffix de la 1ere occurrence de slice,
+   ou None si cette occurrence n'existe pas .
+   --> l = before @ slice @ after
 *)
-   let first_occ (slice : 'a list) (list : 'a list)
-   : ('a list * 'a list) option =
-   let rec aux pattern before list =
-     match (list , pattern) with
-     | ([], []) -> Some ([],[])
-     | ([], _) -> None
-     | (x::rest, _) -> 
-         match cut_prefix pattern list with
-         | None -> aux pattern (x::before) rest
-         | Some suffixe -> Some (List.rev before, suffixe)
-   in aux slice [] list
+let first_occ (slice : 'a list) (list : 'a list) : ('a list * 'a list) option =
+  let rec aux pattern before list =
+    match (list , pattern) with
+    | ([], []) -> Some ([],[]) (*si la liste est vide et le motif de la rech vide ->  Some ([],[]) *)
+    | ([], _) -> None (*si  liste vide or que le motif n'est pas vide -> None*)
+    | (x::rest, _) -> 
+        match cut_prefix pattern list with (*sinon on check si pattern est bien le prefix *)
+        | None -> aux pattern (x::before) rest (*si le suffix = None -> on concat le elem avant dans before *)
+        | Some suffixe -> Some (List.rev before, suffixe) 
+  in aux slice [] list
 
 (*
   first_occ [1; 2] [1; 1; 1; 2; 3; 4; 1; 2] = Some ([1; 1], [3; 4; 1; 2])
