@@ -146,6 +146,7 @@ let cut_genes (dna : dna) : (dna list) =
 
 type 'a consensus = Full of 'a | Partial of 'a * int | No_consensus;;
 
+(*renoit la liste des elements sans doublons*)
 let remove_duplicates (liste : 'a list) : 'a list =
   let rec aux liste1 acc = 
     match liste1 with
@@ -158,26 +159,26 @@ let remove_duplicates (liste : 'a list) : 'a list =
 ;;
 
 let max1_max2 (list_f : int list) (list_e : 'a list) =
-  (*aux recup les 2 elms *)
+  (*aux recup les 2 elms (e1 , e1)correspondant aux 2 plus grande frequences (m1, m2 ) tq m1 >=m2 *)
   let rec aux e1 m1 e2 m2 l_f l_e=
     match (l_f,l_e) with 
     | ([],[]) -> ((!e1,!m1), (!e2,!m2))
     | (freq::rest_f,e::rest_e) -> 
-        if (freq >= !m1) then
+        if (freq > !m1) then (*si freq de e > la val de m1 on passe à l'echange *)
           begin 
-            m2 := !m1;
-            e2 := !e1;
-            m1 := freq;
-            e1 := Some e;
+            m2 := !m1; (*m2 recoit la derniere valeur de m1*)
+            e2 := !e1; (*e2 recoit la derniere valeur de e1*)
+            m1 := freq; (*update de m1 avec la freq max*)
+            e1 := Some e; 
           end
         else 
-        if freq > !m2 then 
+        if freq > !m2 then (*si freq <= m1 mais freq> m2 on update la 2eme valeur max*)
           begin 
             e2 := Some e;
             m2 := freq;
           end;
         aux e1 m1 e2 m2 rest_f rest_e
-    | (_,_) -> ((None,0),(None,0))
+    | (_,_) -> ((None,0),(None,0)) (*cas de liste paas de la meme taille --> pas possible *)
   in 
   aux (ref None) (ref 0) (ref None) (ref 0 ) list_f list_e       
 ;;
@@ -221,8 +222,7 @@ let consensus (list : 'a list) : 'a consensus =
    in the elements of ll, compute the consensus  of the set of values at this
    position  in the sequences. the lists must be of same length. if all lists
    are empty, return the empty sequence.
- *)
-
+*)
 let consensus_sequence (ll : 'a list list) : 'a consensus list =
   List.map (fun sous_l -> consensus sous_l) ll ;;
    
