@@ -42,6 +42,7 @@ let rec is_empty e =
 ;;
 
 
+
 (* null e renvoie true si et seulement si le mot vide est reconnu par e. *)
 let rec null e =
   match e with

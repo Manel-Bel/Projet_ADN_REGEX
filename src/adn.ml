@@ -200,10 +200,6 @@ let consensus (list : 'a list) : 'a consensus =
     | _ -> No_consensus
 ;;
 
-
-
-;;
- 
 (*
    consensus [1; 1; 1; 1] = Full 1
    consensus [1; 1; 1; 2] = Partial (1, 3)
@@ -217,9 +213,10 @@ let consensus (list : 'a list) : 'a consensus =
  *)
 
 let consensus_sequence (ll : 'a list list) : 'a consensus list =
-  failwith "À compléter";;
+  List.map (fun sous_l -> consensus sous_l) ll ;;
+   
 
-(*
+  (*
  consensus_sequence [[1; 1; 1; 1];
                      [1; 1; 1; 2];
                      [1; 1; 2; 2];
@@ -228,4 +225,3 @@ let consensus_sequence (ll : 'a list list) : 'a consensus list =
 
  consensus_sequence [[]; []; []] = []
  *)
-
