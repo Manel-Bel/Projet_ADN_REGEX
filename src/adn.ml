@@ -111,17 +111,21 @@ let first_occ (slice : 'a list) (list : 'a list) : ('a list * 'a list) option =
   first_occ [1; 3] [1; 1; 1; 2; 3; 4; 1; 2] = None
  *)
 
-let rec slices_between
+(* renvoie la liste de toutes les sous_liste encadrées par start et stop *)
+let slices_between
   (start : 'a list) (stop : 'a list) (list : 'a list) : 'a list list =
-  match list with
-  | [] -> []
-  | _ -> 
-    match first_occ start list with 
-    | None -> []
-    | Some (before_start, suffix_start) -> 
-      match (first_occ stop suffix_start) with 
-      | None -> []
-      | Some (before_stop, suffix_stop) -> before_stop :: (slices_between start stop suffix_stop)
+  let rec aux start stop list acc = 
+    match list with
+    | [] -> List.rev acc (*acc = accumulateur de ]start;stop[ *)
+    | _ -> 
+      match first_occ start list with 
+      | None -> List.rev acc (*S'il y n'y pas/plus de prefixe dans la liste*)
+      | Some (before_start, suffix_start) -> 
+        match (first_occ stop suffix_start) with 
+        | None -> List.rev acc (*S'il y n'y pas/plus de suffixe dans la liste*)
+        (*On rappelle aux pour trouver les autres occurences*)
+        | Some (before_stop, suffix_stop) -> aux start stop suffix_stop (before_stop::acc)   
+  in aux start stop list []
   ;;
 
 (*
