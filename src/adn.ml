@@ -218,13 +218,33 @@ let consensus (list : 'a list) : 'a consensus =
    consensus [1; 1; 2; 2] = No_consensus
  *)
 
+(*retourne l'inverse des lignes par colonnes *)
+let transpose (list : 'a list list ) : 'a list list =
+  match list with 
+    | [] -> []
+    | l1::rests -> 
+        let leng = List.length l1 in 
+        if (List.for_all (fun sous_l -> leng = (List.length sous_l)) list ) then (*toutes les sous listes ont la meme taille *)
+          let rec aux acc_j list = 
+            if (List.mem [] list ) then List.rev acc_j (*si on trouve one sous liste vide c'est qu'on a fini*)
+            else 
+              let acc = List.map (fun l -> 
+                  (List.hd l)) list in (*recup du premier elm de chanque sous liste*)
+              let acc_tl = List.map (fun l -> List.tl l ) list in 
+              aux (acc :: acc_j) acc_tl (*appel à aux avec la concat de la premier liste avec un j fixé avec acc_j et lereste des restes de sous liste*)
+          in 
+          aux [] list
+        else []
+  ;;
+  
 (* return the consensus sequence of a list of sequences : for each position
    in the elements of ll, compute the consensus  of the set of values at this
    position  in the sequences. the lists must be of same length. if all lists
    are empty, return the empty sequence.
 *)
 let consensus_sequence (ll : 'a list list) : 'a consensus list =
-  List.map (fun sous_l -> consensus sous_l) ll ;;
+  let new_list = transpose ll in 
+  List.map (fun sous_l -> consensus sous_l) new_list ;;
    
 
   (*
