@@ -10,22 +10,21 @@ type dna = base list
 
 let string_of_base (b : base) : string =
   match b with
-    A -> "A"
+  | A -> "A"
   | C -> "C"
   | G -> "G"
   | T -> "T"
   | WC -> "."
+;;
 
-
-(* explode a string into a char list *)
+(* explode : convertit une chaîne de caractères en une liste de caractères *)
 let explode (str : string) : char list =
-  let rec aux chaine index acc =
-    if index < 0 then
-      acc 
-    else aux chaine (index - 1) (chaine.[index] :: acc) 
-  (* failwith "À compléter" *)
+  let rec aux chaine index acc = 
+    if index < 0 then (*on s'arrete si on est au debut de la chaine *)
+      acc (*la liste de char*)
+    else aux chaine (index - 1) (chaine.[index] :: acc) (*on dec l'indice *)
   in
-  aux str ((String.length str) -1) []
+  aux str ((String.length str) -1) []  (* appel avec la chaine (indice du dernier char) acc  *)
 ;;
 
 
