@@ -38,13 +38,15 @@ let base_of_char (c : char) : base =
   | _ -> WC
 ;; 
 
+(*conversion d'un caractère en base nucléique*)
 let dna_of_string (s : string) : base list =
-  List.map base_of_char (explode s);;
+  List.map base_of_char (explode s);; (*application de base_of_char sur la liste de caractère s*)
 
 
-
+(*conversion d'une chaîne de caractères en un brin d’adn*)
 let string_of_dna (seq : dna) : string =
-  let char_of_base (b : base) : char =
+  (*conversion en char d'un base*)
+  let char_of_base (b : base) : char = 
     match b with 
     | A -> 'A' 
     | C -> 'C'
@@ -52,12 +54,12 @@ let string_of_dna (seq : dna) : string =
     | T -> 'T'
     | WC -> '.'
   in 
-  let rec aux liste =
+  let rec aux liste acc = (*concatenation de chaque char*) 
     match liste with 
-    | [] -> ""
-    | x::rest -> (Char.escaped x)^(aux rest) 
+    | [] -> acc
+    | x::rest -> (aux rest (acc^(Char.escaped x))) (*Char.escaped = convertit un char en String*)
   in 
-  aux (List.map char_of_base seq)
+  aux (List.map char_of_base seq) ""
 
  
 
