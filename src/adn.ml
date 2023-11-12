@@ -132,7 +132,10 @@ let slices_between
   slices_between [1; 1] [1; 2] [1; 1; 1; 1; 2; 1; 3; 1; 2] = [[1]]
  *)
 
+(* en entrée un brin d’ADN, et renvoie la liste de ses gènes, cad les
+sous-listes de la liste encadrées par les listes start et stop*)
 let cut_genes (dna : dna) : (dna list) = 
+  (*start = [A; T; G], stop = [T; A; A]*)
   slices_between [A; T; G] [T; A; A] dna;;
 ;;
 
@@ -155,6 +158,7 @@ let remove_duplicates (liste : 'a list) : 'a list =
 ;;
 
 let max1_max2 (list_f : int list) (list_e : 'a list) =
+  (*aux recup les 2 elms *)
   let rec aux e1 m1 e2 m2 l_f l_e=
     match (l_f,l_e) with 
     | ([],[]) -> ((!e1,!m1), (!e2,!m2))
@@ -175,11 +179,12 @@ let max1_max2 (list_f : int list) (list_e : 'a list) =
         aux e1 m1 e2 m2 rest_f rest_e
     | (_,_) -> ((None,0),(None,0))
   in 
-  aux (ref None) (ref 0) (ref None) (ref 0 ) list_f list_e
-          
+  aux (ref None) (ref 0) (ref None) (ref 0 ) list_f list_e       
 ;;
 
-let freq list list_doublon = 
+let freq (list :'a list) (list_doublon :'a list ) : int list = 
+  (*list <==> la liste des elms sans doublons*)
+  (*calcul de la freq d'un elm specefique *)
   let rec aux elm l acc =
     match l with
     | [] -> acc
@@ -195,13 +200,13 @@ let freq list list_doublon =
 – No_consensus :: autres cas. *)
 let consensus (list : 'a list) : 'a consensus =
   match list with 
-  | [] -> No_consensus
+  | [] -> No_consensus (*si la liste vide -> pas de consensus*)
   | e::reste -> 
-    let set_list = remove_duplicates list in 
-    let freq_list = freq set_list list in 
-    let ((e1, m1),(e2,m2)) = max1_max2 freq_list set_list in 
+    let set_list = remove_duplicates list in (*recup des elements sans doublons*)
+    let freq_list = freq set_list list in (*recup de la liste des frequences des elements*)
+    let ((e1, m1),(e2,m2)) = max1_max2 freq_list set_list in (*recup des 2 elms correspondant aux 2 plus grandes freq*)
     match (e1,e2) with 
-    | (Some e , None) -> Full e (*e1 seul dans set_list*)
+    | (Some e , None) -> Full e (*e2 = None --> on a qu'un seul elm dans la liste*)
     | (Some x, Some y) -> if (m1 = m2) then No_consensus else Partial (x,m1)
     | _ -> No_consensus
 ;;
