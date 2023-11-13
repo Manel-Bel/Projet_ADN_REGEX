@@ -8,12 +8,6 @@ let repeat n l =
   aux n l l
 ;;
 
-(* non terminal *)
-(* let rec repeat_not_ter n l = 
-  if n = 0 then []
-  else l@ (repeat_not_ter (n-1) l) 
-;; *)
-
 (* à revoir *)
 
 (* expr_repeat n e renvoie une expression régulière qui reconnaît les mots
@@ -28,18 +22,20 @@ let expr_repeat n e =
     aux n e 
 ;;
 
-(* is_empty e renvoie true ssi le langage reconnu par e ne contient que le mot vide.
+let rec is_empty' l =
+  match l with
+  | [] -> true
+  | Concat(a, b)::rest | Alt(a,b)::rest -> is_empty' (a::b::rest)
+  | (Base a)::rest -> false
+  | Joker::rest -> false
+  | Eps::rest -> is_empty' rest
+  | (Star a)::rest -> is_empty' (a::rest) 
+
+  (* is_empty e renvoie true ssi le langage reconnu par e ne contient que le mot vide.
    À noter que e n’est pas nécessairement Eps.*)
-let rec is_empty e =
-  match e with 
-  | Eps  -> true 
-  | Base a -> false 
-  | Joker -> false 
-  | Concat (a , b) -> (is_empty a ) && (is_empty b)
-  | Alt (a,b) -> (is_empty a ) && (is_empty b)
-  | Star a -> is_empty a
-  (* | _ -> false this match case is unused. *)
+let is_empty e = is_empty' [e];
 ;;
+
 
 
 
@@ -52,7 +48,7 @@ let rec null e =
   | Concat (a, b) -> (null a) && (null b)
   | Alt (a, b) -> (null a) || (null b)
   | Star a -> true
-                        
+  (* il nous a pas encore dit *)
   (* | _ -> false this match case is unused. *)
 ;;
 
@@ -63,7 +59,7 @@ let rec null e =
 
 (* . Vous pouvez utiliser la fonction union_sorted
 : 'a list -> 'a list -> 'a list vue en TD, qui fait l’«union» de deux
-ensembles représentés par des listes triées. Vous pouvez aussi utiliser la fonction sort_uniq : 'a list -> 'a list qui renvoie son argument trié et sans
+ensembles représentés par des listes triées. Vous pouvez aussi utiliser la fonction sort_uniq : 'a list -> 'a list qui renvoie son argument trié et sans
 duplicata. Vu le coût de cette fonction, attention à ne pas l’utiliser trop souvent. *)
 
 
