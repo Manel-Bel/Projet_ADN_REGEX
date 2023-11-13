@@ -9,7 +9,6 @@ let repeat n l =
 ;;
 
 (* à revoir *)
-
 (* expr_repeat n e renvoie une expression régulière qui reconnaît les mots
 formés de la concaténation de n mots reconnus par e. *)
 let expr_repeat n e = 
@@ -22,24 +21,25 @@ let expr_repeat n e =
     aux n e 
 ;;
 
-let rec is_empty' l =
-  match l with
-  | [] -> true
-  | Concat(a, b)::rest | Alt(a,b)::rest -> is_empty' (a::b::rest)
-  | (Base a)::rest -> false
-  | Joker::rest -> false
-  | Eps::rest -> is_empty' rest
-  | (Star a)::rest -> is_empty' (a::rest) 
+
 
   (* is_empty e renvoie true ssi le langage reconnu par e ne contient que le mot vide.
    À noter que e n’est pas nécessairement Eps.*)
-let is_empty e = is_empty' [e];
+let is_empty e =
+  let rec aux l =
+    match l with
+    | [] -> true
+    | Concat(a, b)::rest | Alt(a,b)::rest -> aux (a::b::rest)
+    | (Base a)::rest -> false
+    | Joker::rest -> false
+    | Eps::rest -> aux rest
+    | (Star a)::rest -> aux (a::rest) 
+  in aux [e];
 ;;
 
 
-
-
 (* null e renvoie true si et seulement si le mot vide est reconnu par e. *)
+(* Notre chargé de TD nous a dit qu'il n'était pas possible de faire une récursion terminale *)
 let rec null e =
   match e with
   | Eps -> true
@@ -48,8 +48,6 @@ let rec null e =
   | Concat (a, b) -> (null a) && (null b)
   | Alt (a, b) -> (null a) || (null b)
   | Star a -> true
-  (* il nous a pas encore dit *)
-  (* | _ -> false this match case is unused. *)
 ;;
 
 (* -------------------------------------------------------------
@@ -61,27 +59,31 @@ let rec null e =
 : 'a list -> 'a list -> 'a list vue en TD, qui fait l’«union» de deux
 ensembles représentés par des listes triées. Vous pouvez aussi utiliser la fonction sort_uniq : 'a list -> 'a list qui renvoie son argument trié et sans
 duplicata. Vu le coût de cette fonction, attention à ne pas l’utiliser trop souvent. *)
-
-let rec is_finite' l = 
-  match l with
-  | [] -> true
-  | Eps::rest | (Base _)::rest | Joker::rest  -> is_finite' rest
-  | Concat (a, b)::rest | Alt (a, b)::rest -> is_finite' (a::b::rest)
-  | (Star a)::rest -> 
-      if (is_empty a) then (is_finite' rest) else false 
-;;
-
-let is_finite e = is_finite' [e]
+let is_finite e =
+  let rec aux l = 
+    match l with
+    | [] -> true
+    | Eps::rest | (Base _)::rest | Joker::rest  -> aux rest
+    | Concat (a, b)::rest | Alt (a, b)::rest -> aux (a::b::rest)
+    | (Star a)::rest -> 
+        if (is_empty a) then (aux rest) else false 
+  in aux [e]
 ;;
 
 (* product l1 l2 renvoie l’ensemble des mots formés de la concaténation
 d’un mot de l1 et d’un mot de l2 *)
-let rec product l1 l2 =
+(* let rec product l1 l2 =
   match l1 with
   | [] -> []
   | a::rest -> (List.map (fun souslist -> a@souslist) l2)@(product rest l2)
-;;
+;; *)
 
+let rec product l1 l2 = 
+  let rec aux l1 l2 acc =
+    match l1 with
+    | [] -> acc
+    | a::rest -> aux rest l2 ((List.map (fun souslist -> a@souslist) l2)@acc)
+  in aux l1 l2 []
 
 (* si e est une expression sur l’ensemble fini de lettres alphabet, alors
 enumerate alphabet e renvoie : Some l où l est le langage reconnu par e si ce
