@@ -62,13 +62,16 @@ let rec null e =
 ensembles représentés par des listes triées. Vous pouvez aussi utiliser la fonction sort_uniq : 'a list -> 'a list qui renvoie son argument trié et sans
 duplicata. Vu le coût de cette fonction, attention à ne pas l’utiliser trop souvent. *)
 
+let rec is_finite' l = 
+  match l with
+  | [] -> true
+  | Eps::rest | (Base _)::rest | Joker::rest  -> is_finite' rest
+  | Concat (a, b)::rest | Alt (a, b)::rest -> is_finite' (a::b::rest)
+  | (Star a)::rest -> 
+      if (is_empty a) then (is_finite' rest) else false 
+;;
 
-let rec is_finite e =
-  match e with 
-  | Eps | Base _ | Joker  -> true
-  | Concat (a, b) | Alt (a, b) -> ((is_finite a) && (is_finite b))
-  | Star a -> 
-    if (is_empty a) then true else false 
+let is_finite e = is_finite' [e]
 ;;
 
 (* product l1 l2 renvoie l’ensemble des mots formés de la concaténation
