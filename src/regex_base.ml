@@ -93,7 +93,7 @@ let expr_to_string =
   Format.asprintf "%a" pp_expr
 
 let sort_uniq l =
-  List.sort Stdlib.compare l
+  List.sort_uniq Stdlib.compare l
 let rec union_sorted l1 l2 =
   match l1, l2 with
   | _, [] -> l1

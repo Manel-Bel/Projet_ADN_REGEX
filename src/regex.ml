@@ -21,10 +21,9 @@ let expr_repeat n e =
     aux n e 
 ;;
 
-
-
-  (* is_empty e renvoie true ssi le langage reconnu par e ne contient que le mot vide.
-   À noter que e n’est pas nécessairement Eps.*)
+(* is_empty e renvoie true ssi le langage reconnu par e ne contient que le mot vide.
+  À noter que e n’est pas nécessairement Eps.*)
+(* is_empty est bien une fonction récursive terminale *)
 let is_empty e =
   let rec aux l =
     match l with
@@ -39,17 +38,7 @@ let is_empty e =
 
 
 (* null e renvoie true si et seulement si le mot vide est reconnu par e. *)
-(* Notre chargé de TD nous a dit qu'il n'était pas possible de faire une récursion terminale *)
-(* let rec null e =
-  match e with
-  | Eps -> true
-  | Base a -> false
-  | Joker -> false 
-  | Concat (a, b) -> (null a) && (null b)
-  | Alt (a, b) -> (null a) || (null b)
-  | Star a -> true
-;; *)
-
+(* null est une fonction récursive terminale *)
 let null e =
   let rec null_aux e fonc =
     match e with 
@@ -147,13 +136,17 @@ let union_sorted l1 l2 =
   
 (* alphabet_expr e renvoie l’ensemble (la liste triée sans duplicata) des
 lettres apparaissant dans e *)
+(*alphabet est bien une fonction récursive terminale*)
 let rec alphabet_expr e = 
-  match e with 
-  | Eps ->  []
-  | Base a -> [a]
-  | Joker -> []
-  | Concat (a,b) | Alt (a,b) ->  union_sorted (alphabet_expr a) (alphabet_expr b)
-  | Star a -> (alphabet_expr a)
+  let rec aux l acc =
+    match l with 
+    | [] -> sort_uniq acc  
+    | Eps::rest -> aux rest acc
+    | Base a::rest -> aux rest (a::acc)
+    | Joker::rest -> aux rest acc
+    | Concat (a,b)::rest | Alt (a,b)::rest -> aux (a::b::rest) acc
+    | Star a::rest -> aux (a::rest) acc
+  in aux [e] []
 ;;
 
 type answer =
