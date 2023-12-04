@@ -17,7 +17,15 @@ let repeat n l =
 (* à revoir *)
 (* expr_repeat n e renvoie une expression régulière qui reconnaît les mots
 formés de la concaténation de n mots reconnus par e. *)
-    
+(* let expr_repeat2 n e = 
+  if (n < 1) then Eps
+  else
+    let rec aux n e = 
+      if (n = 1) then e
+      else Concat (e, aux (n-1) e)
+    in 
+    aux n e    
+     *)
 let expr_repeat n e = 
   if (n < 1) then Eps
   else
@@ -94,7 +102,7 @@ let rec product l1 l2 =
 (* si e est une expression sur l’ensemble fini de lettres alphabet, alors
 enumerate alphabet e renvoie : Some l où l est le langage reconnu par e si ce
 langage est fini ; None si ce langage est infini. *)
-let rec enumerate alphabet e =
+(* let rec enumerate2 alphabet e =
   if not (is_finite e) then None (*Vérif terminaison de l'expr.*)
   else 
     match e with 
@@ -120,7 +128,43 @@ let rec enumerate alphabet e =
              )
         )
     | Star a -> None
+;; *)
+
+let rec enumerate alphabet e =
+  let rec aux_enumerate e fonc = 
+    if not (is_finite e) then fonc None (*Vérif terminaison de l'expr.*)
+    else 
+      match e with 
+      | Eps -> fonc (Some [[]])
+      | Base a -> if List.mem a alphabet then fonc (Some [[a]]) else fonc (Some [[]])
+      | Joker -> fonc (Some (List.map (fun x -> [x]) alphabet))
+      | Concat (a,b) -> 
+          aux_enumerate a (fun enumerateA -> 
+            match enumerateA with 
+            | None -> fonc None
+            | Some alphaA -> aux_enumerate b (fun enumerateB ->
+              match enumerateB with 
+              | None -> fonc None
+              | Some alphaB -> fonc (Some (product alphaA alphaB))
+              )
+            )
+      | Alt(a,b) ->
+        aux_enumerate a (fun enumerateA -> 
+          match enumerateA with 
+          | None -> fonc None
+          | Some alphaA -> aux_enumerate b (fun enumerateB ->
+            match enumerateB with 
+            | None -> fonc None
+            | Some alphaB -> fonc (Some (append_rt alphaA  alphaB))
+            )
+          )
+      | Star a -> fonc None
+   
+  in aux_enumerate e (fun x -> x) 
 ;;
+
+
+
 
 (* union_sorted renvoie la liste triée sans duplicata *)
 let union_sorted l1 l2 =
