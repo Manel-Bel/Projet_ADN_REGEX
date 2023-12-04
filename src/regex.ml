@@ -40,7 +40,7 @@ let is_empty e =
 
 (* null e renvoie true si et seulement si le mot vide est reconnu par e. *)
 (* Notre chargé de TD nous a dit qu'il n'était pas possible de faire une récursion terminale *)
-let rec null e =
+(* let rec null e =
   match e with
   | Eps -> true
   | Base a -> false
@@ -48,7 +48,22 @@ let rec null e =
   | Concat (a, b) -> (null a) && (null b)
   | Alt (a, b) -> (null a) || (null b)
   | Star a -> true
-;;
+;; *)
+
+let null e =
+  let rec null_aux e fonc =
+    match e with 
+    | Eps -> fonc true
+    | Base a -> fonc false
+    | Joker -> fonc false 
+    | Concat (a, b) -> 
+      null_aux a (fun isNullA -> 
+        if isNullA then  null_aux b fonc else fonc false)
+    | Alt (a, b) -> 
+      null_aux a (fun isNullA -> if isNullA then fonc true else null_aux b fonc )
+    | Star a -> fonc true
+  in
+  null_aux e (fun x -> x) 
 
 (* -------------------------------------------------------------
 4.3 Reconnaissance de langages finis
@@ -150,7 +165,7 @@ type answer =
 – Reject si le langage reconnu par e est fini et ne contient pas w.
 l'alphabet de e sera l’union des ensembles des lettres apparaissant 
 dans e et w. *)
-let rec accept_partial e w = 
+let accept_partial e w = 
   if not (is_finite e) then Infinite
   else 
     let alphabet = union_sorted (alphabet_expr e) w in
