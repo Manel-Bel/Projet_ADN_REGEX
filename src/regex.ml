@@ -17,7 +17,7 @@ let repeat n l =
 (* à revoir *)
 (* expr_repeat n e renvoie une expression régulière qui reconnaît les mots
 formés de la concaténation de n mots reconnus par e. *)
-(* let expr_repeat2 n e = 
+(* let expr_repeat n e = 
   if (n < 1) then Eps
   else
     let rec aux n e = 
