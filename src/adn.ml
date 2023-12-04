@@ -81,7 +81,7 @@ let rec cut_prefix (slice : 'a list) (list : 'a list) : 'a list option =
   | (_, []) -> None (*si la liste est vide --> None*)
   | (l1::reste1, l2::reste2) -> 
     if not (l1 = l2) then None (*si le 1er elm de slice <> du 1er elm de List --> slice n'est pas prefix*)
-    else cut_prefix reste1 reste2;; (*sinon on verif pour le reste *)
+    else cut_prefix reste1 reste2;; (*sinon on verifie pour le reste *)
 
 (*
   cut_prefix [1; 2; 3] [1; 2; 3; 4] = Some [4]
@@ -158,6 +158,7 @@ let remove_duplicates (liste : 'a list) : 'a list =
   aux liste []
 ;;
 
+(* Fonction utilisée dans consensus *)
 let max1_max2 (list_f : int list) (list_e : 'a list) =
   (*aux recup les 2 elms (e1 , e1)correspondant aux 2 plus grande frequences (m1, m2 ) tq m1 >=m2 *)
   let rec aux e1 m1 e2 m2 l_f l_e=
@@ -183,6 +184,7 @@ let max1_max2 (list_f : int list) (list_e : 'a list) =
   aux (ref None) (ref 0) (ref None) (ref 0 ) list_f list_e       
 ;;
 
+(* Fonction utilisée dans consensus *)
 let freq (list :'a list) (list_doublon :'a list ) : int list = 
   (*list <==> la liste des elms sans doublons*)
   (*calcul de la freq d'un elm specefique *)
@@ -218,7 +220,9 @@ let consensus (list : 'a list) : 'a consensus =
    consensus [1; 1; 2; 2] = No_consensus
  *)
 
-(*retourne l'inverse des lignes par colonnes *)
+(*retourne l'inverse des lignes par colonnes 
+Fonction utilisée dans consensus_sequence *)
+
 let transpose (list : 'a list list ) : 'a list list =
   match list with 
     | [] -> []
