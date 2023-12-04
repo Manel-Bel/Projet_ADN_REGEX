@@ -1,12 +1,18 @@
-open Regex_base
+open Regex_base  
 
+(* version récursive terminale de @*)
+let append_rt l1 l2 = 
+  List.rev_append (List.rev l1) l2 
+
+(* repeat n w renvoie le mot w concaténé n fois avec lui-même *)
+(* reapeat est bien une fonction récursive terminale *)
 let repeat n l =
   let rec aux n l acc =
-    if n = 0 then []
-    else aux (n-1) l l@acc
+    if n = 0 then acc
+    else aux (n-1) l (append_rt l acc)
   in
-  aux n l l
-;;
+  aux n l []
+
 
 (* à revoir *)
 (* expr_repeat n e renvoie une expression régulière qui reconnaît les mots
@@ -18,8 +24,7 @@ let expr_repeat n e =
       if (n = 1) then e
       else Concat (e, aux (n-1) e)
     in 
-    aux n e 
-;;
+    aux n e     
 
 (* is_empty e renvoie true ssi le langage reconnu par e ne contient que le mot vide.
   À noter que e n’est pas nécessairement Eps.*)
@@ -63,6 +68,7 @@ let null e =
 : 'a list -> 'a list -> 'a list vue en TD, qui fait l’«union» de deux
 ensembles représentés par des listes triées. Vous pouvez aussi utiliser la fonction sort_uniq : 'a list -> 'a list qui renvoie son argument trié et sans
 duplicata. Vu le coût de cette fonction, attention à ne pas l’utiliser trop souvent. *)
+(* is_empty est bien une fonction récursive terminale *)
 let is_finite e =
   let rec aux l = 
     match l with
@@ -74,19 +80,13 @@ let is_finite e =
   in aux [e]
 ;;
 
-(* product l1 l2 renvoie l’ensemble des mots formés de la concaténation
-d’un mot de l1 et d’un mot de l2 *)
-(* let rec product l1 l2 =
-  match l1 with
-  | [] -> []
-  | a::rest -> (List.map (fun souslist -> a@souslist) l2)@(product rest l2)
-;; *)
 
+(* product est bien une fonction récursive terminale *)
 let rec product l1 l2 = 
   let rec aux l1 l2 acc =
     match l1 with
     | [] -> acc
-    | a::rest -> aux rest l2 ((List.map (fun souslist -> a@souslist) l2)@acc)
+    | a::rest -> aux rest l2 (append_rt (List.map (fun souslist -> append_rt a souslist) l2) acc)
   in aux l1 l2 []
 
 (* si e est une expression sur l’ensemble fini de lettres alphabet, alors
@@ -114,7 +114,7 @@ let rec enumerate alphabet e =
          | Some alpha1 ->
              (match (enumerate alphabet b) with 
               | None -> None
-              | Some alpha2 -> Some (alpha1@alpha2)
+              | Some alpha2 -> Some (alpha1@alpha2) (*à changer*)
              )
         )
     | Star a -> None
